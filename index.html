@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Income Tax Calculator AY 2026-27</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,serif;background:#f5f3ee;color:#111;min-height:100vh;font-size:15px}
+header{background:#111;color:#f5f3ee;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:22px;letter-spacing:.04em}
+.logo span{color:#c9a84c;font-style:italic}
+.badge{background:#c9a84c;color:#111;font-size:11px;font-weight:bold;padding:5px 14px;border-radius:20px;letter-spacing:.06em;font-family:Arial,sans-serif}
+.wrap{max-width:1020px;margin:0 auto;padding:44px 20px 100px}
+.hero{text-align:center;margin-bottom:44px}
+.hero h1{font-size:clamp(32px,5vw,52px);line-height:1.15;margin-bottom:10px}
+.hero h1 em{font-style:italic;color:#c9a84c}
+.hero p{color:#777;font-family:Arial,sans-serif;font-size:14px;max-width:500px;margin:0 auto}
+.steps{display:flex;align-items:center;justify-content:center;margin-bottom:44px;font-family:Arial,sans-serif}
+.sdot{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.sc{width:30px;height:30px;border-radius:50%;border:2px solid #ccc;background:#f5f3ee;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#999;transition:all .2s}
+.sdot.active .sc{background:#111;border-color:#111;color:#f5f3ee}
+.sdot.done .sc{background:#c9a84c;border-color:#c9a84c;color:#111}
+.sl{font-size:10px;color:#999;letter-spacing:.08em;text-transform:uppercase}
+.sdot.active .sl{color:#111;font-weight:bold}
+.sline{width:55px;height:1px;background:#ccc;margin-bottom:20px}
+.sec{display:none}
+.sec.on{display:block}
+.card{background:#fff;border:1px solid #ddd;border-radius:12px;overflow:hidden;margin-bottom:18px}
+.ch{padding:18px 26px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px}
+.cnum{width:26px;height:26px;background:#111;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;flex-shrink:0;font-family:Arial,sans-serif}
+.ctitle{font-size:17px}
+.cb{padding:24px 26px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+.cs2{grid-column:span 2}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:10px;font-weight:bold;letter-spacing:.1em;text-transform:uppercase;color:#888;font-family:Arial,sans-serif}
+.fld input,.fld select{background:#f5f3ee;border:1.5px solid #ddd;border-radius:7px;padding:10px 13px;font-family:Georgia,serif;font-size:14px;color:#111;outline:none;width:100%;transition:border-color .2s,box-shadow .2s}
+.fld input:focus,.fld select:focus{border-color:#c9a84c;box-shadow:0 0 0 3px rgba(201,168,76,.15)}
+.hint{font-size:11px;color:#999;font-family:Arial,sans-serif}
+.pw{position:relative}
+.pw span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#999;font-size:14px;pointer-events:none}
+.pw input{padding-left:26px}
+.tg{display:flex;flex-direction:column;gap:5px}
+.tg small{font-size:10px;font-weight:bold;letter-spacing:.1em;text-transform:uppercase;color:#888;font-family:Arial,sans-serif}
+.tgr{display:flex;border:1.5px solid #ddd;border-radius:7px;overflow:hidden}
+.tgr label{flex:1;text-align:center;cursor:pointer;font-size:13px;font-family:Arial,sans-serif;border-right:1px solid #ddd}
+.tgr label:last-child{border-right:none}
+.tgr input[type=radio]{display:none}
+.tgo{display:block;padding:9px 6px;transition:background .2s,color .2s}
+.tgr input[type=radio]:checked+.tgo{background:#111;color:#fff}
+.nav{display:flex;justify-content:space-between;margin-top:32px}
+.btn{padding:12px 30px;border-radius:40px;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s;border:none;letter-spacing:.02em}
+.bg{background:transparent;border:1.5px solid #ccc;color:#111}
+.bg:hover{border-color:#111}
+.bp{background:#111;color:#fff}
+.bp:hover{background:#2a2a2a;transform:translateY(-1px)}
+.bgo{background:#c9a84c;color:#111}
+.bgo:hover{background:#e6c96a;transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,168,76,.35)}
+.div{height:1px;background:#eee;margin:20px 0}
+.note{background:#fffdf0;border:1px solid #e8d98a;border-radius:7px;padding:11px 15px;font-size:12px;color:#7a6520;font-family:Arial,sans-serif;margin-top:14px}
+.linp{padding:10px 13px;border:1.5px solid #ddd;border-radius:7px;font-family:Georgia,serif;font-size:14px;background:#f5f3ee;width:100%;outline:none;color:#111;transition:border-color .2s}
+.linp:focus{border-color:#c9a84c;box-shadow:0 0 0 3px rgba(201,168,76,.15)}
+
+/* Results */
+#res{display:none}
+.sbanner{background:#111;color:#fff;border-radius:12px;padding:26px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.sbanner h3{font-size:20px;margin-bottom:4px}
+.sbanner p{font-size:13px;color:#aaa;font-family:Arial,sans-serif}
+.snum{font-size:42px;color:#c9a84c;white-space:nowrap}
+.rcmp{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
+.rc{border:2px solid #ddd;border-radius:12px;padding:24px;background:#fff;transition:all .2s}
+.rc.win{border-color:#c9a84c;box-shadow:0 0 0 4px rgba(201,168,76,.12)}
+.rlbl{font-size:11px;font-weight:bold;letter-spacing:.1em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;margin-bottom:7px}
+.rname{font-size:19px;margin-bottom:18px}
+.tamt{font-size:34px;line-height:1;margin-bottom:5px}
+.tamt.pay{color:#8b2e2e}
+.tamt.ref{color:#2a6e4e}
+.tamt.zero{color:#999}
+.tstat{font-size:12px;color:#999;font-family:Arial,sans-serif;margin-bottom:14px}
+.wb{display:inline-block;background:#c9a84c;color:#111;font-size:11px;font-weight:bold;padding:5px 12px;border-radius:20px;font-family:Arial,sans-serif}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+.dc{background:#fff;border:1px solid #ddd;border-radius:10px;overflow:hidden}
+.dch{background:#f0ede6;padding:13px 18px;font-size:11px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase;color:#888;font-family:Arial,sans-serif}
+.dr{display:flex;justify-content:space-between;align-items:center;padding:9px 18px;border-bottom:1px solid #f0ede6;font-size:13.5px;font-family:Arial,sans-serif}
+.dr:last-child{border-bottom:none}
+.dr.tot{background:#f5f3ee;font-weight:bold;font-size:14px}
+.dv{font-weight:bold}
+.dv.neg{color:#8b2e2e}
+.dv.pos{color:#2a6e4e}
+.ms{background:#fff;border:1px solid #ddd;border-radius:12px;overflow:hidden;margin-bottom:22px}
+.msh{padding:18px 26px;border-bottom:1px solid #eee}
+.msh h3{font-size:18px}
+.msh p{font-size:13px;color:#999;font-family:Arial,sans-serif;margin-top:3px}
+.mt{width:100%;border-collapse:collapse;font-size:12px;font-family:Arial,sans-serif}
+.mt th{background:#f0ede6;padding:9px 11px;text-align:right;font-size:9.5px;font-weight:bold;letter-spacing:.07em;text-transform:uppercase;color:#888;border-bottom:1px solid #ddd}
+.mt th:first-child{text-align:left}
+.mt td{padding:9px 11px;text-align:right;border-bottom:1px solid #f0ede6}
+.mt td:first-child{text-align:left;font-weight:bold}
+.mt tr.ft td{font-weight:bold;background:#f5f3ee;border-top:2px solid #ddd;border-bottom:none}
+.ar{display:flex;gap:12px;justify-content:center;margin-top:36px}
+@media(max-width:680px){.g2,.g3,.rcmp,.dg{grid-template-columns:1fr}.cs2{grid-column:span 1}.sline{width:28px}.sbanner{flex-direction:column;gap:14px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Tax<span>Calc</span></div>
+  <div style="text-align:right">
+    <div style="font-size:11px;color:#aaa;font-family:Arial,sans-serif;margin-bottom:4px">AY 2026–27 · FY 2025–26</div>
+    <span class="badge">INDIA · GOVT. EMPLOYEE</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>Calculate your <em>Income Tax</em><br>instantly</h1>
+    <p>Old Regime vs New Regime comparison for government &amp; public sector employees</p>
+  </div>
+
+  <div class="steps">
+    <div class="sdot active" id="d1" onclick="goTo(1)"><div class="sc">1</div><div class="sl">Personal</div></div>
+    <div class="sline"></div>
+    <div class="sdot" id="d2" onclick="goTo(2)"><div class="sc">2</div><div class="sl">Salary</div></div>
+    <div class="sline"></div>
+    <div class="sdot" id="d3" onclick="goTo(3)"><div class="sc">3</div><div class="sl">Deductions</div></div>
+    <div class="sline"></div>
+    <div class="sdot" id="d4"><div class="sc">4</div><div class="sl">Results</div></div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="sec on" id="s1">
+    <div class="card">
+      <div class="ch"><div class="cnum">A</div><div class="ctitle">Personal Details</div></div>
+      <div class="cb">
+        <div class="g2">
+          <div class="fld cs2"><label>Full Name</label><input type="text" id="name" placeholder="e.g. Ramesh Kumar"></div>
+          <div class="fld"><label>Designation</label><input type="text" id="desg" placeholder="e.g. Assistant Teacher"></div>
+          <div class="fld"><label>PAN Number</label><input type="text" id="pan" placeholder="ABCDE1234F" maxlength="10" style="text-transform:uppercase"></div>
+          <div class="fld"><label>Date of Birth</label><input type="date" id="dob" value="1980-04-01"></div>
+          <div class="fld"><label>School / Office Name</label><input type="text" id="office" placeholder="Enter office name"></div>
+          <div class="fld"><label>Office TAN</label><input type="text" id="tan" placeholder="ABCD12345E"></div>
+          <div class="fld"><label>PF Scheme</label>
+            <select id="pf">
+              <option value="CPS">CPS (New Pension Scheme)</option>
+              <option value="GPF">GPF (General Provident Fund)</option>
+            </select>
+          </div>
+          <div class="fld"><label>City Category (HRA)</label>
+            <select id="cat">
+              <option value="A">A – Metro (Chennai/Mumbai/Delhi/Kolkata)</option>
+              <option value="B" selected>B – State Capital / Major City</option>
+              <option value="C">C – District Headquarters</option>
+              <option value="D">D – Other Towns</option>
+              <option value="E">E – Remote / Rural</option>
+            </select>
+          </div>
+          <div class="tg">
+            <small>Metro City? (50% HRA)</small>
+            <div class="tgr">
+              <label><input type="radio" name="metro" value="No" checked><span class="tgo">No</span></label>
+              <label><input type="radio" name="metro" value="Yes"><span class="tgo">Yes (Mumbai/Delhi/Chennai/Kolkata)</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="nav"><span></span><button class="btn bp" onclick="goTo(2)">Next: Salary Details →</button></div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="sec" id="s2">
+    <div class="card">
+      <div class="ch"><div class="cnum">B</div><div class="ctitle">Salary Details</div></div>
+      <div class="cb">
+        <div class="g2">
+          <div class="fld"><label>Basic Pay (Mar 2025)</label><div class="pw"><span>₹</span><input type="number" id="bmar" value="30000" min="0"></div><span class="hint">Before annual increment</span></div>
+          <div class="fld"><label>Basic Pay After Increment</label><div class="pw"><span>₹</span><input type="number" id="bincr" value="30900" min="0"></div><span class="hint">Same as above if no increment</span></div>
+          <div class="fld"><label>Increment Month</label>
+            <select id="imonth">
+              <option value="">— No Increment this FY —</option>
+              <option value="Apr-2025">Apr-2025</option>
+              <option value="Jul-2025" selected>Jul-2025</option>
+              <option value="Oct-2025">Oct-2025</option>
+              <option value="Jan-2026">Jan-2026</option>
+            </select>
+          </div>
+          <div class="fld"><label>Personal Pay (monthly)</label><div class="pw"><span>₹</span><input type="number" id="pp" value="0" min="0"></div></div>
+          <div class="fld"><label>SPF Deduction (monthly)</label><div class="pw"><span>₹</span><input type="number" id="spf" value="70" min="0"></div></div>
+          <div class="fld"><label>Conveyance Allowance (monthly)</label><div class="pw"><span>₹</span><input type="number" id="conv" value="0" min="0"></div></div>
+          <div class="fld"><label>Risk Allowance (monthly)</label><div class="pw"><span>₹</span><input type="number" id="risk" value="0" min="0"></div><span class="hint">e.g. for hazardous / field duty posts</span></div>
+          <div class="fld"><label>Monthly House Rent Paid</label><div class="pw"><span>₹</span><input type="number" id="rent" value="0" min="0"></div><span class="hint">0 if in Govt. quarters</span></div>
+          <div class="fld"><label>TDS Deducted by Employer</label><div class="pw"><span>₹</span><input type="number" id="tds" value="0" min="0"></div><span class="hint">Total TDS cut from salary this FY</span></div>
+          <div class="fld"><label>Advance Tax Paid</label><div class="pw"><span>₹</span><input type="number" id="advtax" value="0" min="0"></div></div>
+        </div>
+        <div class="div"></div>
+        <div class="g3">
+          <div class="tg"><small>LOP Days – Nov 2025</small><input type="number" class="linp" id="lopn" value="0" min="0" max="30"></div>
+          <div class="tg"><small>LOP Days – Dec 2025</small><input type="number" class="linp" id="lopd" value="0" min="0" max="31"></div>
+          <div class="tg"><small>LOP Days – Jan 2026</small><input type="number" class="linp" id="lopj" value="0" min="0" max="31"></div>
+          <div class="tg"><small>LOP Days – Mar 2026</small><input type="number" class="linp" id="lopm" value="0" min="0" max="31"></div>
+        </div>
+        <div class="note">ℹ️ DA pre-configured: 53% (Apr) → 55% (May–Oct) → 58% (Nov–Mar). DA arrear for May 2025 auto-calculated. Financial year: Apr 2025 – Mar 2026.</div>
+      </div>
+    </div>
+    <div class="nav"><button class="btn bg" onclick="goTo(1)">← Back</button><button class="btn bp" onclick="goTo(3)">Next: Deductions →</button></div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="sec" id="s3">
+    <div class="card">
+      <div class="ch"><div class="cnum">C</div><div class="ctitle">Deductions &amp; Other Income</div></div>
+      <div class="cb">
+        <p style="font-size:13px;color:#888;font-family:Arial,sans-serif;margin-bottom:18px">Chapter VI-A deductions apply <strong>only under Old Regime</strong>. Leave 0 if not applicable.</p>
+        <div class="g2">
+          <div class="fld"><label>Professional Tax (annual)</label><div class="pw"><span>₹</span><input type="number" id="ptax" value="0" min="0"></div></div>
+          <div class="fld"><label>Housing Loan Interest u/s 24(b)</label><div class="pw"><span>₹</span><input type="number" id="hli" value="0" min="0"></div><span class="hint">Max ₹2,00,000</span></div>
+          <div class="fld"><label>HBA Principal Repaid (80C)</label><div class="pw"><span>₹</span><input type="number" id="hbap" value="0" min="0"></div></div>
+          <div class="fld"><label>LIC / PLI Premium (extra)</label><div class="pw"><span>₹</span><input type="number" id="lic" value="0" min="0"></div></div>
+          <div class="fld"><label>PPF / RPF</label><div class="pw"><span>₹</span><input type="number" id="ppf" value="0" min="0"></div></div>
+          <div class="fld"><label>NSC Purchase</label><div class="pw"><span>₹</span><input type="number" id="nsc" value="0" min="0"></div></div>
+          <div class="fld"><label>ELSS Mutual Funds</label><div class="pw"><span>₹</span><input type="number" id="elss" value="0" min="0"></div></div>
+          <div class="fld"><label>Tuition Fees (max 2 children)</label><div class="pw"><span>₹</span><input type="number" id="tuit" value="0" min="0"></div></div>
+          <div class="fld"><label>Sukanya Samriddhi Yojana</label><div class="pw"><span>₹</span><input type="number" id="ssy" value="0" min="0"></div></div>
+          <div class="fld"><label>Other 80C Investments</label><div class="pw"><span>₹</span><input type="number" id="o80c" value="0" min="0"></div></div>
+          <div class="fld"><label>NPS Voluntary u/s 80CCD(1B)</label><div class="pw"><span>₹</span><input type="number" id="nps" value="0" min="0"></div><span class="hint">Max ₹50,000</span></div>
+          <div class="fld"><label>Medical Insurance 80D (self)</label><div class="pw"><span>₹</span><input type="number" id="med1" value="0" min="0"></div></div>
+          <div class="fld"><label>Medical Insurance 80D (parents)</label><div class="pw"><span>₹</span><input type="number" id="med2" value="0" min="0"></div></div>
+          <div class="fld"><label>Education Loan Interest 80E</label><div class="pw"><span>₹</span><input type="number" id="edu" value="0" min="0"></div></div>
+          <div class="fld"><label>Savings Interest 80TTA</label><div class="pw"><span>₹</span><input type="number" id="tta" value="0" min="0"></div><span class="hint">Max ₹10,000</span></div>
+          <div class="fld"><label>Donation 80G (Govt – 100%)</label><div class="pw"><span>₹</span><input type="number" id="dg1" value="0" min="0"></div></div>
+          <div class="fld"><label>Donation 80G (NGO – 50%)</label><div class="pw"><span>₹</span><input type="number" id="dg2" value="0" min="0"></div></div>
+          <div class="fld"><label>Relief u/s 89</label><div class="pw"><span>₹</span><input type="number" id="r89" value="0" min="0"></div></div>
+          <div class="fld"><label>Other Income (FD/House Property)</label><div class="pw"><span>₹</span><input type="number" id="oinc" value="0" min="0"></div></div>
+        </div>
+        <div class="div"></div>
+        <div class="g2">
+          <div class="tg"><small>Physically Disabled Self (&gt;40%)</small>
+            <div class="tgr"><label><input type="radio" name="ds" value="No" checked><span class="tgo">No</span></label><label><input type="radio" name="ds" value="Yes"><span class="tgo">Yes</span></label></div>
+          </div>
+          <div class="tg"><small>Severely Disabled Self (&gt;80%)</small>
+            <div class="tgr"><label><input type="radio" name="ss" value="No" checked><span class="tgo">No</span></label><label><input type="radio" name="ss" value="Yes"><span class="tgo">Yes</span></label></div>
+          </div>
+          <div class="tg"><small>Disabled Dependent (&gt;40%)</small>
+            <div class="tgr"><label><input type="radio" name="dd" value="No" checked><span class="tgo">No</span></label><label><input type="radio" name="dd" value="Yes"><span class="tgo">Yes</span></label></div>
+          </div>
+          <div class="tg"><small>Severely Disabled Dependent (&gt;80%)</small>
+            <div class="tgr"><label><input type="radio" name="sd" value="No" checked><span class="tgo">No</span></label><label><input type="radio" name="sd" value="Yes"><span class="tgo">Yes</span></label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="nav"><button class="btn bg" onclick="goTo(2)">← Back</button><button class="btn bgo" onclick="calculate()">⚡ Calculate Now</button></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="res">
+    <div class="sbanner">
+      <div><h3 id="st">Computing…</h3><p id="ss2"></p></div>
+      <div class="snum" id="sn">₹0</div>
+    </div>
+    <div class="rcmp">
+      <div class="rc" id="co">
+        <div class="rlbl">Old Tax Regime</div>
+        <div class="rname">With Deductions</div>
+        <div class="tamt" id="otd">₹0</div>
+        <div class="tstat" id="ots">Net Tax Payable</div>
+        <div id="owb" style="display:none"><span class="wb">★ Better Regime</span></div>
+      </div>
+      <div class="rc" id="cn">
+        <div class="rlbl">New Tax Regime</div>
+        <div class="rname">Standard Deduction ₹75,000</div>
+        <div class="tamt" id="ntd">₹0</div>
+        <div class="tstat" id="nts">Net Tax Payable</div>
+        <div id="nwb" style="display:none"><span class="wb">★ Better Regime</span></div>
+      </div>
+    </div>
+    <div class="dg">
+      <div class="dc"><div class="dch">Old Regime Breakdown</div><div id="od"></div></div>
+      <div class="dc"><div class="dch">New Regime Breakdown</div><div id="nd"></div></div>
+    </div>
+    <div class="ms">
+      <div class="msh"><h3>Monthly Salary Statement</h3><p>FY 2025-26 · Auto-calculated from your inputs</p></div>
+      <div style="overflow-x:auto">
+        <table class="mt">
+          <thead><tr><th>Month</th><th>Basic</th><th>DA</th><th>DA Arr.</th><th>HRA</th><th>Risk Allow.</th><th>Other Allow.</th><th>Gross</th><th>CPS/GPF</th><th>SPF</th><th>Total Ded.</th><th>Net Pay</th></tr></thead>
+          <tbody id="mb"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ar">
+      <button class="btn bg" onclick="goTo(3)">← Edit Inputs</button>
+      <button class="btn bp" onclick="dlMonthlyPDF()">⬇ Monthly Statement PDF</button>
+      <button class="btn bgo" onclick="dlPDF()">⬇ Full Tax Report PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function goTo(n){
+  [1,2,3].forEach(i=>{document.getElementById('s'+i).classList.remove('on')});
+  if(n<=3)document.getElementById('s'+n).classList.add('on');
+  document.getElementById('res').style.display=(n===4)?'block':'none';
+  [1,2,3,4].forEach(i=>{
+    var d=document.getElementById('d'+i);
+    d.classList.remove('active','done');
+    if(i<n)d.classList.add('done');
+    if(i===n)d.classList.add('active');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+var gv=function(id){return parseFloat(document.getElementById(id)&&document.getElementById(id).value)||0};
+var gs=function(id){return (document.getElementById(id)&&document.getElementById(id).value)||''};
+var gr=function(nm){var el=document.querySelector('input[name="'+nm+'"]:checked');return el?el.value:'No'};
+var fi=function(n){return (n<0?'-':'')+'\u20b9'+Math.abs(Math.round(n)).toLocaleString('en-IN')};
+
+var DA={'Apr-2025':.53,'May-2025':.55,'Jun-2025':.55,'Jul-2025':.55,'Aug-2025':.55,'Sep-2025':.55,'Oct-2025':.55,'Nov-2025':.58,'Dec-2025':.58,'Jan-2026':.58,'Feb-2026':.58,'Mar-2026':.58};
+var MONS=Object.keys(DA);
+var MDAYS={'Nov-2025':30,'Dec-2025':31,'Jan-2026':31,'Mar-2026':31};
+
+function getHRA(basic,cat){
+  var t={A:[[20600,1300],[30800,1500],[41100,1800],[1e9,2100]],B:[[20600,700],[30800,1000],[41100,1200],[1e9,1400]],C:[[20600,600],[30800,700],[41100,800],[1e9,1000]],D:[[20600,400],[30800,450],[41100,500],[1e9,700]],E:[[20600,250],[30800,300],[41100,350],[1e9,400]]};
+  var rows=t[cat]||t.B;
+  for(var i=0;i<rows.length;i++){if(basic<=rows[i][0])return rows[i][1];}
+  return 0;
+}
+
+function buildRows(){
+  var bm=gv('bmar'),bi=gv('bincr'),im=gs('imonth'),cat=gs('cat'),pf=gs('pf');
+  var pp=gv('pp'),spf=gv('spf'),cv=gv('conv'),risk=gv('risk');
+  var lopMap={'Nov-2025':gv('lopn'),'Dec-2025':gv('lopd'),'Jan-2026':gv('lopj'),'Mar-2026':gv('lopm')};
+  // DA arrear: Apr-2025 was paid at 53%, May revision to 55% → arrear = 2% of Apr basic
+  var arrMay=Math.round(bm*0.02);
+  var prev=bm,rows=[];
+  MONS.forEach(function(m){
+    if(m===im&&im)prev=bi;
+    var b=prev,lf=1;
+    if(lopMap[m]&&lopMap[m]>0){lf=(MDAYS[m]-lopMap[m])/MDAYS[m];b=Math.round(prev*lf);}
+    var da=Math.round(b*DA[m]);
+    var arr=(m==='May-2025')?arrMay:0;
+    var hra=Math.round(getHRA(prev,cat)*lf);
+    var ppm=Math.round(pp*lf),cvm=Math.round(cv*lf),riskm=Math.round(risk*lf);
+    var other=hra+ppm+cvm+riskm;
+    var gross=b+da+arr+other;
+    var cpsgpf=pf==='CPS'?Math.round((b+da)*0.1):Math.round(bm*0.06);
+    var spfm=Math.round(spf*lf);
+    var td=cpsgpf+spfm;
+    rows.push({m:m,b:b,da:da,arr:arr,hra:hra,risk:riskm,other:other,gross:gross,cpsgpf:cpsgpf,spf:spfm,td:td,net:gross-td});
+  });
+  return rows;
+}
+
+function calcOld(gross,hraEx,rows){
+  var ptax=Math.min(gv('ptax'),2500),hli=Math.min(gv('hli'),200000);
+  var oinc=gv('oinc');
+  var gti=Math.max(gross-hraEx-50000-ptax-hli,0)+oinc;
+  var cpsTot=rows.reduce(function(s,r){return s+r.cpsgpf},0);
+  var spfTot=rows.reduce(function(s,r){return s+r.spf},0);
+  var raw80c=cpsTot+spfTot+gv('hbap')+gv('lic')+gv('ppf')+gv('nsc')+gv('elss')+gv('tuit')+gv('ssy')+gv('o80c');
+  var d80c=Math.min(raw80c,150000);
+  var nps=Math.min(gv('nps'),50000);
+  var yr=parseInt(gs('dob').split('-')[0])||1980,sc=yr<=1966;
+  var d80d=Math.min(gv('med1'),sc?50000:25000)+Math.min(gv('med2'),sc?50000:25000);
+  var d80dd=gr('dd')==='Yes'?(gr('sd')==='Yes'?125000:75000):0;
+  var d80u=gr('ds')==='Yes'?(gr('ss')==='Yes'?125000:75000):0;
+  var d80e=gv('edu'),d80tta=Math.min(gv('tta'),10000);
+  var d80g=gv('dg1')+Math.round(gv('dg2')/2);
+  var tVI=d80c+nps+d80d+d80dd+d80u+d80e+d80tta+d80g;
+  var nti=Math.round(Math.max(gti-tVI,0)/10)*10;
+  var tax=0;
+  if(nti>250000)tax+=Math.min(nti-250000,250000)*0.05;
+  if(nti>500000)tax+=Math.min(nti-500000,500000)*0.20;
+  if(nti>1000000)tax+=(nti-1000000)*0.30;
+  var reb=nti<=500000?tax:0; tax=Math.max(tax-reb,0);
+  var sur=0;if(nti>5000000)sur=tax*(nti>50000000?.37:nti>20000000?.25:nti>10000000?.15:.10);
+  var cess=Math.round((tax+sur)*0.04),total=Math.round(tax+sur+cess);
+  var tds=gv('tds')+gv('advtax');
+  return{gross:gross,hraEx:hraEx,ptax:ptax,hli:hli,oinc:oinc,gti:gti,tVI:tVI,d80c:d80c,nps:nps,d80d:d80d,d80dd:d80dd,d80u:d80u,d80e:d80e,d80tta:d80tta,d80g:d80g,nti:nti,tax:Math.round(tax),reb:Math.round(reb),sur:Math.round(sur),cess:cess,total:total,tds:tds,net:total-gv('r89')-tds};
+}
+
+function calcNew(gross){
+  var ptax=gv('ptax'),oinc=gv('oinc');
+  var nti=Math.round(Math.max(gross-75000-ptax+oinc,0)/10)*10;
+  var tax=0;
+  if(nti>400000)tax+=Math.min(nti-400000,400000)*0.05;
+  if(nti>800000)tax+=Math.min(nti-800000,400000)*0.10;
+  if(nti>1200000)tax+=Math.min(nti-1200000,400000)*0.15;
+  if(nti>1600000)tax+=Math.min(nti-1600000,400000)*0.20;
+  if(nti>2000000)tax+=Math.min(nti-2000000,400000)*0.25;
+  if(nti>2400000)tax+=(nti-2400000)*0.30;
+  var reb=nti<=1200000?tax:0;
+  var mar=0;if(nti>1200000&&nti<1275000)mar=Math.max(tax-reb-(nti-1200000),0);
+  tax=Math.max(tax-reb-mar,0);
+  var sur=0;if(nti>5000000)sur=tax*(nti>50000000?.37:nti>20000000?.25:nti>10000000?.15:.10);
+  var cess=Math.round((tax+sur)*0.04),total=Math.round(tax+sur+cess);
+  var tds=gv('tds')+gv('advtax');
+  return{gross:gross,ptax:ptax,oinc:oinc,nti:nti,tax:Math.round(tax),reb:Math.round(reb),mar:Math.round(mar),sur:Math.round(sur),cess:cess,total:total,tds:tds,net:total-gv('r89')-tds};
+}
+
+function rr(cid,arr){
+  document.getElementById(cid).innerHTML=arr.map(function(r){
+    return '<div class="dr'+(r.t?' tot':'')+'"><span>'+r.l+'</span><span class="dv'+(r.n?' neg':r.p?' pos':'')+'">'+r.v+'</span></div>';
+  }).join('');
+}
+
+function txUI(val,did,sid,cid){
+  var d=document.getElementById(did),s=document.getElementById(sid),c=document.getElementById(cid);
+  if(val>0){d.textContent=fi(val);d.className='tamt pay';s.textContent='Net Tax Payable';}
+  else if(val<0){d.textContent=fi(-val);d.className='tamt ref';s.textContent='Refund Due';}
+  else{d.textContent='\u20b90';d.className='tamt zero';s.textContent='No Tax Due';}
+}
+
+function calculate(){
+  var rows=buildRows();
+  var gross=rows.reduce(function(s,r){return s+r.gross},0);
+  var hraRcvd=rows.reduce(function(s,r){return s+r.hra},0);
+  var rentAnn=gv('rent')*12;
+  var payDA=rows.reduce(function(s,r){return s+r.b+r.da},0);
+  var metro=gr('metro')==='Yes';
+  var hraPct=Math.round(payDA*(metro?.5:.4));
+  var hraRent=Math.max(rentAnn-Math.round(payDA*.1),0);
+  var hraEx=rentAnn>0?Math.min(hraRcvd,hraRent,hraPct):0;
+  var o=calcOld(gross,hraEx,rows),n=calcNew(gross);
+  window._data={o:o,n:n,rows:rows};
+
+  var ob=o.net<=n.net,sav=Math.abs(o.net-n.net);
+  document.getElementById('sn').textContent=fi(sav);
+  document.getElementById('st').textContent='You save '+fi(sav)+' with '+(ob?'Old':'New')+' Regime';
+  document.getElementById('ss2').textContent=(ob?'Old':'New')+' Regime is better for you this financial year';
+
+  txUI(o.net,'otd','ots','co');txUI(n.net,'ntd','nts','cn');
+  document.getElementById('co').className='rc'+(ob?' win':'');
+  document.getElementById('cn').className='rc'+(!ob?' win':'');
+  document.getElementById('owb').style.display=ob?'block':'none';
+  document.getElementById('nwb').style.display=!ob?'block':'none';
+
+  rr('od',[
+    {l:'Gross Salary Income',v:fi(o.gross)},
+    {l:'Less: HRA Exempt u/s 10(13A)',v:fi(-o.hraEx),n:o.hraEx>0},
+    {l:'Less: Standard Deduction ₹50,000',v:fi(-50000),n:true},
+    {l:'Less: Professional Tax',v:fi(-o.ptax),n:o.ptax>0},
+    {l:'Less: Housing Loan Interest',v:fi(-o.hli),n:o.hli>0},
+    {l:'Add: Other Income',v:fi(o.oinc),p:o.oinc>0},
+    {l:'Gross Total Income',v:fi(o.gti),t:true},
+    {l:'Less: Chapter VI-A Deductions',v:fi(-o.tVI),n:true},
+    {l:'Net Taxable Income',v:fi(o.nti),t:true},
+    {l:'Income Tax',v:fi(o.tax)},
+    {l:'Less: Rebate u/s 87A',v:fi(-o.reb),n:o.reb>0},
+    {l:'Surcharge',v:fi(o.sur)},
+    {l:'H&E Cess @4%',v:fi(o.cess)},
+    {l:'Total Tax',v:fi(o.total),t:true},
+    {l:'Less: TDS + Advance Tax',v:fi(-o.tds),n:o.tds>0},
+    {l:'Net Tax / Refund',v:fi(o.net),t:true,n:o.net>0,p:o.net<0},
+  ]);
+  rr('nd',[
+    {l:'Gross Salary Income',v:fi(n.gross)},
+    {l:'Less: Standard Deduction ₹75,000',v:fi(-75000),n:true},
+    {l:'Less: Professional Tax',v:fi(-n.ptax),n:n.ptax>0},
+    {l:'Add: Other Income',v:fi(n.oinc),p:n.oinc>0},
+    {l:'Net Taxable Income',v:fi(n.nti),t:true},
+    {l:'Income Tax (new slabs)',v:fi(n.tax)},
+    {l:'Less: Rebate u/s 87A (upto 12L)',v:fi(-n.reb),n:n.reb>0},
+    {l:'Marginal Relief',v:fi(-n.mar),n:n.mar>0},
+    {l:'Surcharge',v:fi(n.sur)},
+    {l:'H&E Cess @4%',v:fi(n.cess)},
+    {l:'Total Tax',v:fi(n.total),t:true},
+    {l:'Less: TDS + Advance Tax',v:fi(-n.tds),n:n.tds>0},
+    {l:'Net Tax / Refund',v:fi(n.net),t:true,n:n.net>0,p:n.net<0},
+  ]);
+
+  var tot={b:0,da:0,arr:0,hra:0,risk:0,other:0,gross:0,cpsgpf:0,spf:0,td:0,net:0};
+  var html=rows.map(function(r){
+    Object.keys(tot).forEach(function(k){tot[k]+=(r[k]||0);});
+    return '<tr><td>'+r.m+'</td><td>'+r.b.toLocaleString('en-IN')+'</td><td>'+r.da.toLocaleString('en-IN')+'</td><td>'+(r.arr?r.arr.toLocaleString('en-IN'):'-')+'</td><td>'+r.hra.toLocaleString('en-IN')+'</td><td>'+r.risk.toLocaleString('en-IN')+'</td><td>'+(r.other-r.risk).toLocaleString('en-IN')+'</td><td><strong>'+r.gross.toLocaleString('en-IN')+'</strong></td><td>'+r.cpsgpf.toLocaleString('en-IN')+'</td><td>'+r.spf.toLocaleString('en-IN')+'</td><td>'+r.td.toLocaleString('en-IN')+'</td><td><strong>'+r.net.toLocaleString('en-IN')+'</strong></td></tr>';
+  }).join('');
+  html+='<tr class="ft"><td>TOTAL</td><td>'+tot.b.toLocaleString('en-IN')+'</td><td>'+tot.da.toLocaleString('en-IN')+'</td><td>'+tot.arr.toLocaleString('en-IN')+'</td><td>'+tot.hra.toLocaleString('en-IN')+'</td><td>'+tot.risk.toLocaleString('en-IN')+'</td><td>'+(tot.other-tot.risk).toLocaleString('en-IN')+'</td><td>'+tot.gross.toLocaleString('en-IN')+'</td><td>'+tot.cpsgpf.toLocaleString('en-IN')+'</td><td>'+tot.spf.toLocaleString('en-IN')+'</td><td>'+tot.td.toLocaleString('en-IN')+'</td><td>'+tot.net.toLocaleString('en-IN')+'</td></tr>';
+  document.getElementById('mb').innerHTML=html;
+  goTo(4);
+}
+
+function dlPDF(){
+  if(!window._data){alert('Please calculate first.');return;}
+  var jP=window.jspdf;if(!jP){alert('PDF library not loaded. Please check internet connection.');return;}
+  var doc=new jP.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var W=210,M=14,y=0;
+  var D=window._data,o=D.o,n=D.n,rows=D.rows;
+  var nm=gs('name')||'Employee',pan=gs('pan')||'-',dob=gs('dob')||'-',desg=gs('desg')||'-',off=gs('office')||'-',tn=gs('tan')||'-';
+
+  function addPg(){doc.addPage();y=20;doc.setFillColor(17,17,17);doc.rect(0,0,W,12,'F');doc.setFontSize(7.5);doc.setTextColor(180,180,180);doc.setFont('helvetica','normal');doc.text('IT Computation Statement AY 2026-27',M,8);doc.text(nm,W-M,8,{align:'right'});}
+
+  // Cover
+  doc.setFillColor(17,17,17);doc.rect(0,0,W,62,'F');
+  doc.setFillColor(201,168,76);doc.rect(0,62,W,2.5,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(22);doc.setTextColor(255,255,255);doc.text('Income Tax Computation',W/2,25,{align:'center'});
+  doc.setFontSize(10);doc.setTextColor(201,168,76);doc.text('Assessment Year 2026-27  |  Financial Year 2025-26',W/2,37,{align:'center'});
+  doc.setFontSize(8.5);doc.setTextColor(160,160,160);doc.text('Generated: '+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}),W/2,48,{align:'center'});
+  y=73;
+
+  doc.setFillColor(248,246,240);doc.roundedRect(M,y,W-2*M,40,2,2,'F');doc.setDrawColor(210,205,195);doc.setLineWidth(0.3);doc.roundedRect(M,y,W-2*M,40,2,2,'S');
+  var info=[['Name',nm],['PAN',pan],['Designation',desg],['DOB',dob],['Office',off],['TAN',tn]];
+  info.forEach(function(item,i){var cx=(i%2===0)?M+5:W/2+5,ry=y+7+Math.floor(i/2)*12;doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(130,127,120);doc.text(item[0].toUpperCase(),cx,ry);doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(17,17,17);doc.text(item[1],cx,ry+5);});
+  y+=48;
+
+  var ob=o.net<=n.net,sv=Math.abs(o.net-n.net);
+  doc.setFillColor(ob?42:25,ob?78:50,ob?50:92);doc.roundedRect(M,y,W-2*M,18,2,2,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(255,255,255);doc.text('RECOMMENDED: '+(ob?'OLD':'NEW')+' REGIME',M+5,y+7);
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.text('Savings of '+fi(sv)+' vs '+(ob?'New':'Old')+' Regime',M+5,y+14);
+  y+=26;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(17,17,17);doc.text('Regime Comparison',M,y);y+=7;
+  var c2=W/2,c3=W-M;
+  function dTH(l,a,b){doc.setFillColor(17,17,17);doc.rect(M,y-5,W-2*M,8,'F');doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(255,255,255);doc.text(l,M+3,y);doc.text(a,c2-2,y,{align:'right'});doc.text(b,c3-2,y,{align:'right'});y+=6;}
+  function dTR(l,a,b,tot){if(tot){doc.setFillColor(237,234,226);doc.rect(M,y-4.5,W-2*M,8,'F');}doc.setFont('helvetica',tot?'bold':'normal');doc.setFontSize(tot?9:8.5);doc.setTextColor(17,17,17);doc.text(l,M+3,y);doc.text(a,c2-2,y,{align:'right'});doc.text(b,c3-2,y,{align:'right'});if(!tot){doc.setDrawColor(228,225,220);doc.setLineWidth(0.2);doc.line(M,y+3,W-M,y+3);}y+=7;}
+
+  dTH('Particulars','Old Regime','New Regime');
+  dTR('Gross Salary',fi(o.gross),fi(n.gross));
+  dTR('HRA Exemption',fi(-o.hraEx),'—');
+  dTR('Standard Deduction',fi(-50000),fi(-75000));
+  dTR('Professional Tax',fi(-o.ptax),fi(-n.ptax));
+  dTR('Housing Loan Interest',fi(-o.hli),'—');
+  dTR('Chapter VI-A Deductions',fi(-o.tVI),'—');
+  dTR('Other Income',fi(o.oinc),fi(n.oinc));
+  dTR('Net Taxable Income',fi(o.nti),fi(n.nti),true);
+  dTR('Income Tax',fi(o.tax),fi(n.tax));
+  dTR('Rebate u/s 87A',fi(-o.reb),fi(-n.reb));
+  dTR('Marginal Relief','—',fi(-n.mar));
+  dTR('Surcharge',fi(o.sur),fi(n.sur));
+  dTR('H&E Cess @4%',fi(o.cess),fi(n.cess));
+  dTR('Total Tax',fi(o.total),fi(n.total),true);
+  dTR('TDS + Advance Tax',fi(-o.tds),fi(-n.tds));
+  doc.setFillColor(201,168,76);doc.rect(M,y-4.5,W-2*M,9,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(17,17,17);doc.text('Net Tax Payable / Refund',M+3,y);
+  var co=o.net<0?[42,110,78]:o.net>0?[139,46,46]:[100,100,100];
+  var cn=n.net<0?[42,110,78]:n.net>0?[139,46,46]:[100,100,100];
+  doc.setTextColor(co[0],co[1],co[2]);doc.text(fi(o.net),c2-2,y,{align:'right'});
+  doc.setTextColor(cn[0],cn[1],cn[2]);doc.text(fi(n.net),c3-2,y,{align:'right'});
+  y+=14;
+
+  // Page 2 monthly
+  addPg();
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(17,17,17);doc.text('Monthly Salary Statement – FY 2025-26',M,y);y+=8;
+  var mc=['Month','Basic','DA','DA Arr','HRA','Risk','Other','Gross','CPS/GPF','SPF','Ded.','Net Pay'];
+  var mw=[20,15,13,12,12,13,13,16,16,11,14,15];
+  var xp=M;
+  doc.setFillColor(17,17,17);doc.rect(M,y-5,W-2*M,8,'F');doc.setFontSize(6.5);doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');
+  mc.forEach(function(c,i){doc.text(c,xp+mw[i]/2,y,{align:'center'});xp+=mw[i];});y+=5;
+
+  rows.forEach(function(r,idx){
+    if(y>270)addPg();
+    var vs=[r.m,r.b.toLocaleString('en-IN'),r.da.toLocaleString('en-IN'),r.arr?r.arr.toLocaleString('en-IN'):'-',r.hra.toLocaleString('en-IN'),r.risk.toLocaleString('en-IN'),(r.other-r.risk).toLocaleString('en-IN'),r.gross.toLocaleString('en-IN'),r.cpsgpf.toLocaleString('en-IN'),r.spf.toLocaleString('en-IN'),r.td.toLocaleString('en-IN'),r.net.toLocaleString('en-IN')];
+    if(idx%2===0){doc.setFillColor(248,246,240);doc.rect(M,y-4,W-2*M,7,'F');}
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(17,17,17);
+    xp=M;vs.forEach(function(v,i){doc.text(v,i===0?xp+2:xp+mw[i],y,{align:i===0?'left':'right'});xp+=mw[i];});
+    doc.setDrawColor(228,225,220);doc.setLineWidth(0.15);doc.line(M,y+3,W-M,y+3);y+=7;
+  });
+  var tt=rows.reduce(function(a,r){['b','da','arr','hra','risk','other','gross','cpsgpf','spf','td','net'].forEach(function(k){a[k]=(a[k]||0)+r[k];});return a;},{});
+  doc.setFillColor(17,17,17);doc.rect(M,y-4,W-2*M,9,'F');
+  var tv=['TOTAL',tt.b,tt.da,tt.arr||0,tt.hra,tt.risk,tt.other-tt.risk,tt.gross,tt.cpsgpf,tt.spf,tt.td,tt.net].map(function(v,i){return i===0?v:v.toLocaleString('en-IN');});
+  doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(255,255,255);
+  xp=M;tv.forEach(function(v,i){doc.text(v,i===0?xp+2:xp+mw[i],y,{align:i===0?'left':'right'});xp+=mw[i];});
+
+  var pc=doc.internal.getNumberOfPages();
+  for(var i=1;i<=pc;i++){doc.setPage(i);doc.setFontSize(7);doc.setTextColor(150,147,140);doc.setFont('helvetica','normal');doc.text('Page '+i+' of '+pc+' | This is a computation aid, not a legal document.',W/2,292,{align:'center'});}
+  doc.save('IT_Computation_'+nm.replace(/\s+/g,'_')+'_AY2026-27.pdf');
+}
+
+function dlMonthlyPDF(){
+  if(!window._data){alert('Please calculate first.');return;}
+  var jP=window.jspdf;if(!jP){alert('PDF library not loaded.');return;}
+  var doc=new jP.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  var W=297,M=12,y=14;
+  var rows=window._data.rows;
+  var nm=gs('name')||'Employee',desg=gs('desg')||'',off=gs('office')||'';
+  doc.setFillColor(17,17,17);doc.rect(0,0,W,12,'F');
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text('Monthly Salary Statement – FY 2025-26 (Apr 2025 to Mar 2026)',M,8);
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(201,168,76);
+  doc.text(nm+(desg?' | '+desg:'')+(off?' | '+off:''),W-M,8,{align:'right'});
+  y=20;
+  var mc=['Month','Basic Pay','DA','DA Arrear','HRA','Risk Allow.','Other Allow.','Gross Pay','CPS/GPF','SPF','Total Ded.','Net Pay'];
+  var mw=[22,20,17,18,17,20,20,20,20,14,18,19];
+  var xp=M;
+  doc.setFillColor(17,17,17);doc.rect(M,y-5,W-2*M,9,'F');
+  doc.setFontSize(7.5);doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');
+  mc.forEach(function(c,i){doc.text(c,xp+mw[i]/2,y,{align:'center'});xp+=mw[i];});y+=6;
+  var tt={b:0,da:0,arr:0,hra:0,risk:0,oth:0,gross:0,cpsgpf:0,spf:0,td:0,net:0};
+  rows.forEach(function(r,idx){
+    var oth=r.other-r.risk;
+    tt.b+=r.b;tt.da+=r.da;tt.arr+=r.arr;tt.hra+=r.hra;tt.risk+=r.risk;tt.oth+=oth;tt.gross+=r.gross;tt.cpsgpf+=r.cpsgpf;tt.spf+=r.spf;tt.td+=r.td;tt.net+=r.net;
+    if(idx%2===0){doc.setFillColor(248,246,240);doc.rect(M,y-4.5,W-2*M,8,'F');}
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(17,17,17);
+    var vs=[r.m,r.b,r.da,r.arr||0,r.hra,r.risk,oth,r.gross,r.cpsgpf,r.spf,r.td,r.net];
+    xp=M;vs.forEach(function(v,i){
+      var s=i===0?String(v):v.toLocaleString('en-IN');
+      doc.setFont('helvetica',(i===7||i===11)?'bold':'normal');
+      doc.text(s,i===0?xp+2:xp+mw[i],y,{align:i===0?'left':'right'});xp+=mw[i];
+    });
+    doc.setDrawColor(228,225,220);doc.setLineWidth(0.15);doc.line(M,y+3.5,W-M,y+3.5);y+=8;
+  });
+  doc.setFillColor(17,17,17);doc.rect(M,y-4.5,W-2*M,9,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(255,255,255);
+  var tvs=['TOTAL',tt.b,tt.da,tt.arr,tt.hra,tt.risk,tt.oth,tt.gross,tt.cpsgpf,tt.spf,tt.td,tt.net];
+  xp=M;tvs.forEach(function(v,i){doc.text(i===0?String(v):v.toLocaleString('en-IN'),i===0?xp+2:xp+mw[i],y,{align:i===0?'left':'right'});xp+=mw[i];});
+  y+=14;
+  doc.setFillColor(248,246,240);doc.roundedRect(M,y,W-2*M,22,2,2,'F');
+  doc.setDrawColor(210,205,195);doc.setLineWidth(0.3);doc.roundedRect(M,y,W-2*M,22,2,2,'S');
+  [['Total Gross Earnings',tt.gross],['Total Deductions',tt.td],['Total Net Pay',tt.net]].forEach(function(item,i){
+    var sx=M+6+i*(W-2*M)/3;
+    doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(130,127,120);doc.text(item[0].toUpperCase(),sx,y+8);
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(17,17,17);doc.text('\u20b9'+item[1].toLocaleString('en-IN'),sx,y+17);
+  });
+  doc.setFontSize(7);doc.setTextColor(150,147,140);doc.setFont('helvetica','normal');
+  doc.text('Generated: '+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})+' | Computation aid only.',W/2,200,{align:'center'});
+  doc.save('Monthly_Salary_'+nm.replace(/\s+/g,'_')+'_FY2025-26.pdf');
+}
+</script>
+</body>
+</html>
