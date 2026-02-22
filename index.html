@@ -314,6 +314,7 @@ var gv=function(id){return parseFloat(document.getElementById(id)&&document.getE
 var gs=function(id){return (document.getElementById(id)&&document.getElementById(id).value)||''};
 var gr=function(nm){var el=document.querySelector('input[name="'+nm+'"]:checked');return el?el.value:'No'};
 var fi=function(n){return (n<0?'-':'')+'\u20b9'+Math.abs(Math.round(n)).toLocaleString('en-IN')};
+var fp=function(n){return (n<0?'-':'')+'Rs.'+Math.abs(Math.round(n)).toLocaleString('en-IN')};
 
 var DA={'Apr-2025':.53,'May-2025':.55,'Jun-2025':.55,'Jul-2025':.55,'Aug-2025':.55,'Sep-2025':.55,'Oct-2025':.55,'Nov-2025':.58,'Dec-2025':.58,'Jan-2026':.58,'Feb-2026':.58,'Mar-2026':.58};
 var MONS=Object.keys(DA);
@@ -506,7 +507,7 @@ function dlPDF(){
   doc.setFillColor(220,220,220);doc.roundedRect(M,y,W-2*M,18,2,2,'F');
   doc.setDrawColor(150,150,150);doc.setLineWidth(0.3);doc.roundedRect(M,y,W-2*M,18,2,2,'S');
   doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(17,17,17);doc.text('RECOMMENDED: '+(ob?'OLD':'NEW')+' REGIME',M+5,y+7);
-  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(60,60,60);doc.text('Savings of '+fi(sv)+' vs '+(ob?'New':'Old')+' Regime',M+5,y+14);
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(60,60,60);doc.text('Savings of '+fp(sv)+' vs '+(ob?'New':'Old')+' Regime',M+5,y+14);
   y+=26;
 
   doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(17,17,17);doc.text('Regime Comparison',M,y);y+=7;
@@ -515,26 +516,26 @@ function dlPDF(){
   function dTR(l,a,b,tot){if(tot){doc.setFillColor(235,235,235);doc.rect(M,y-4.5,W-2*M,8,'F');}doc.setFont('helvetica',tot?'bold':'normal');doc.setFontSize(tot?9:8.5);doc.setTextColor(17,17,17);doc.text(l,M+3,y);doc.text(a,c2-2,y,{align:'right'});doc.text(b,c3-2,y,{align:'right'});if(!tot){doc.setDrawColor(200,200,200);doc.setLineWidth(0.2);doc.line(M,y+3,W-M,y+3);}y+=7;}
 
   dTH('Particulars','Old Regime','New Regime');
-  dTR('Gross Salary',fi(o.gross),fi(n.gross));
-  dTR('HRA Exemption',fi(-o.hraEx),'—');
-  dTR('Standard Deduction',fi(-50000),fi(-75000));
-  dTR('Professional Tax',fi(-o.ptax),fi(-n.ptax));
-  dTR('Housing Loan Interest',fi(-o.hli),'—');
-  dTR('Chapter VI-A Deductions',fi(-o.tVI),'—');
-  dTR('Other Income',fi(o.oinc),fi(n.oinc));
-  dTR('Net Taxable Income',fi(o.nti),fi(n.nti),true);
-  dTR('Income Tax',fi(o.tax),fi(n.tax));
-  dTR('Rebate u/s 87A',fi(-o.reb),fi(-n.reb));
-  dTR('Marginal Relief','—',fi(-n.mar));
-  dTR('Surcharge',fi(o.sur),fi(n.sur));
-  dTR('H&E Cess @4%',fi(o.cess),fi(n.cess));
-  dTR('Total Tax',fi(o.total),fi(n.total),true);
-  dTR('TDS + Advance Tax',fi(-o.tds),fi(-n.tds));
+  dTR('Gross Salary',fp(o.gross),fp(n.gross));
+  dTR('HRA Exemption',fp(-o.hraEx),'—');
+  dTR('Standard Deduction',fp(-50000),fp(-75000));
+  dTR('Professional Tax',fp(-o.ptax),fp(-n.ptax));
+  dTR('Housing Loan Interest',fp(-o.hli),'—');
+  dTR('Chapter VI-A Deductions',fp(-o.tVI),'—');
+  dTR('Other Income',fp(o.oinc),fp(n.oinc));
+  dTR('Net Taxable Income',fp(o.nti),fp(n.nti),true);
+  dTR('Income Tax',fp(o.tax),fp(n.tax));
+  dTR('Rebate u/s 87A',fp(-o.reb),fp(-n.reb));
+  dTR('Marginal Relief','—',fp(-n.mar));
+  dTR('Surcharge',fp(o.sur),fp(n.sur));
+  dTR('H&E Cess @4%',fp(o.cess),fp(n.cess));
+  dTR('Total Tax',fp(o.total),fp(n.total),true);
+  dTR('TDS + Advance Tax',fp(-o.tds),fp(-n.tds));
   doc.setFillColor(220,220,220);doc.rect(M,y-4.5,W-2*M,9,'F');
   doc.setDrawColor(150,150,150);doc.setLineWidth(0.3);doc.rect(M,y-4.5,W-2*M,9,'S');
   doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(17,17,17);doc.text('Net Tax Payable / Refund',M+3,y);
-  doc.text(fi(o.net),c2-2,y,{align:'right'});
-  doc.text(fi(n.net),c3-2,y,{align:'right'});
+  doc.text(fp(o.net),c2-2,y,{align:'right'});
+  doc.text(fp(n.net),c3-2,y,{align:'right'});
   y+=14;
 
   // Page 2 monthly
@@ -613,7 +614,7 @@ function dlMonthlyPDF(){
   [['Total Gross Earnings',tt.gross],['Total Deductions',tt.td],['Total Net Pay',tt.net]].forEach(function(item,i){
     var sx=M+6+i*(W-2*M)/3;
     doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(130,127,120);doc.text(item[0].toUpperCase(),sx,y+8);
-    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(17,17,17);doc.text('\u20b9'+item[1].toLocaleString('en-IN'),sx,y+17);
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(17,17,17);doc.text('Rs.'+item[1].toLocaleString('en-IN'),sx,y+17);
   });
   doc.setFontSize(7);doc.setTextColor(150,147,140);doc.setFont('helvetica','normal');
   doc.text('Generated: '+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})+' | Computation aid only.',W/2,200,{align:'center'});
