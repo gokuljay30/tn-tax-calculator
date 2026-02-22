@@ -487,31 +487,32 @@ function dlPDF(){
   var D=window._data,o=D.o,n=D.n,rows=D.rows;
   var nm=gs('name')||'Employee',pan=gs('pan')||'-',dob=gs('dob')||'-',desg=gs('desg')||'-',off=gs('office')||'-',tn=gs('tan')||'-';
 
-  function addPg(){doc.addPage();y=20;doc.setFillColor(17,17,17);doc.rect(0,0,W,12,'F');doc.setFontSize(7.5);doc.setTextColor(180,180,180);doc.setFont('helvetica','normal');doc.text('IT Computation Statement AY 2026-27',M,8);doc.text(nm,W-M,8,{align:'right'});}
+  function addPg(){doc.addPage();y=20;doc.setFillColor(220,220,220);doc.rect(0,0,W,12,'F');doc.setDrawColor(150,150,150);doc.setLineWidth(0.3);doc.line(0,12,W,12);doc.setFontSize(7.5);doc.setTextColor(17,17,17);doc.setFont('helvetica','normal');doc.text('IT Computation Statement AY 2026-27',M,8);doc.text(nm,W-M,8,{align:'right'});}
 
   // Cover
-  doc.setFillColor(17,17,17);doc.rect(0,0,W,62,'F');
-  doc.setFillColor(201,168,76);doc.rect(0,62,W,2.5,'F');
-  doc.setFont('helvetica','bold');doc.setFontSize(22);doc.setTextColor(255,255,255);doc.text('Income Tax Computation',W/2,25,{align:'center'});
-  doc.setFontSize(10);doc.setTextColor(201,168,76);doc.text('Assessment Year 2026-27  |  Financial Year 2025-26',W/2,37,{align:'center'});
-  doc.setFontSize(8.5);doc.setTextColor(160,160,160);doc.text('Generated: '+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}),W/2,48,{align:'center'});
+  doc.setFillColor(220,220,220);doc.rect(0,0,W,62,'F');
+  doc.setDrawColor(150,150,150);doc.setLineWidth(0.5);doc.line(0,62,W,62);
+  doc.setFont('helvetica','bold');doc.setFontSize(22);doc.setTextColor(17,17,17);doc.text('Income Tax Computation',W/2,25,{align:'center'});
+  doc.setFontSize(10);doc.setTextColor(60,60,60);doc.text('Assessment Year 2026-27  |  Financial Year 2025-26',W/2,37,{align:'center'});
+  doc.setFontSize(8.5);doc.setTextColor(100,100,100);doc.text('Generated: '+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}),W/2,48,{align:'center'});
   y=73;
 
-  doc.setFillColor(248,246,240);doc.roundedRect(M,y,W-2*M,40,2,2,'F');doc.setDrawColor(210,205,195);doc.setLineWidth(0.3);doc.roundedRect(M,y,W-2*M,40,2,2,'S');
+  doc.setFillColor(245,245,245);doc.roundedRect(M,y,W-2*M,40,2,2,'F');doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);doc.roundedRect(M,y,W-2*M,40,2,2,'S');
   var info=[['Name',nm],['PAN',pan],['Designation',desg],['DOB',dob],['Office',off],['TAN',tn]];
-  info.forEach(function(item,i){var cx=(i%2===0)?M+5:W/2+5,ry=y+7+Math.floor(i/2)*12;doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(130,127,120);doc.text(item[0].toUpperCase(),cx,ry);doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(17,17,17);doc.text(item[1],cx,ry+5);});
+  info.forEach(function(item,i){var cx=(i%2===0)?M+5:W/2+5,ry=y+7+Math.floor(i/2)*12;doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(100,100,100);doc.text(item[0].toUpperCase(),cx,ry);doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(17,17,17);doc.text(item[1],cx,ry+5);});
   y+=48;
 
   var ob=o.net<=n.net,sv=Math.abs(o.net-n.net);
-  doc.setFillColor(ob?42:25,ob?78:50,ob?50:92);doc.roundedRect(M,y,W-2*M,18,2,2,'F');
-  doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(255,255,255);doc.text('RECOMMENDED: '+(ob?'OLD':'NEW')+' REGIME',M+5,y+7);
-  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.text('Savings of '+fi(sv)+' vs '+(ob?'New':'Old')+' Regime',M+5,y+14);
+  doc.setFillColor(220,220,220);doc.roundedRect(M,y,W-2*M,18,2,2,'F');
+  doc.setDrawColor(150,150,150);doc.setLineWidth(0.3);doc.roundedRect(M,y,W-2*M,18,2,2,'S');
+  doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(17,17,17);doc.text('RECOMMENDED: '+(ob?'OLD':'NEW')+' REGIME',M+5,y+7);
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(60,60,60);doc.text('Savings of '+fi(sv)+' vs '+(ob?'New':'Old')+' Regime',M+5,y+14);
   y+=26;
 
   doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(17,17,17);doc.text('Regime Comparison',M,y);y+=7;
   var c2=W/2,c3=W-M;
-  function dTH(l,a,b){doc.setFillColor(17,17,17);doc.rect(M,y-5,W-2*M,8,'F');doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(255,255,255);doc.text(l,M+3,y);doc.text(a,c2-2,y,{align:'right'});doc.text(b,c3-2,y,{align:'right'});y+=6;}
-  function dTR(l,a,b,tot){if(tot){doc.setFillColor(237,234,226);doc.rect(M,y-4.5,W-2*M,8,'F');}doc.setFont('helvetica',tot?'bold':'normal');doc.setFontSize(tot?9:8.5);doc.setTextColor(17,17,17);doc.text(l,M+3,y);doc.text(a,c2-2,y,{align:'right'});doc.text(b,c3-2,y,{align:'right'});if(!tot){doc.setDrawColor(228,225,220);doc.setLineWidth(0.2);doc.line(M,y+3,W-M,y+3);}y+=7;}
+  function dTH(l,a,b){doc.setFillColor(220,220,220);doc.rect(M,y-5,W-2*M,8,'F');doc.setDrawColor(150,150,150);doc.setLineWidth(0.3);doc.rect(M,y-5,W-2*M,8,'S');doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(17,17,17);doc.text(l,M+3,y);doc.text(a,c2-2,y,{align:'right'});doc.text(b,c3-2,y,{align:'right'});y+=6;}
+  function dTR(l,a,b,tot){if(tot){doc.setFillColor(235,235,235);doc.rect(M,y-4.5,W-2*M,8,'F');}doc.setFont('helvetica',tot?'bold':'normal');doc.setFontSize(tot?9:8.5);doc.setTextColor(17,17,17);doc.text(l,M+3,y);doc.text(a,c2-2,y,{align:'right'});doc.text(b,c3-2,y,{align:'right'});if(!tot){doc.setDrawColor(200,200,200);doc.setLineWidth(0.2);doc.line(M,y+3,W-M,y+3);}y+=7;}
 
   dTH('Particulars','Old Regime','New Regime');
   dTR('Gross Salary',fi(o.gross),fi(n.gross));
@@ -529,12 +530,11 @@ function dlPDF(){
   dTR('H&E Cess @4%',fi(o.cess),fi(n.cess));
   dTR('Total Tax',fi(o.total),fi(n.total),true);
   dTR('TDS + Advance Tax',fi(-o.tds),fi(-n.tds));
-  doc.setFillColor(201,168,76);doc.rect(M,y-4.5,W-2*M,9,'F');
+  doc.setFillColor(220,220,220);doc.rect(M,y-4.5,W-2*M,9,'F');
+  doc.setDrawColor(150,150,150);doc.setLineWidth(0.3);doc.rect(M,y-4.5,W-2*M,9,'S');
   doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(17,17,17);doc.text('Net Tax Payable / Refund',M+3,y);
-  var co=o.net<0?[42,110,78]:o.net>0?[139,46,46]:[100,100,100];
-  var cn=n.net<0?[42,110,78]:n.net>0?[139,46,46]:[100,100,100];
-  doc.setTextColor(co[0],co[1],co[2]);doc.text(fi(o.net),c2-2,y,{align:'right'});
-  doc.setTextColor(cn[0],cn[1],cn[2]);doc.text(fi(n.net),c3-2,y,{align:'right'});
+  doc.text(fi(o.net),c2-2,y,{align:'right'});
+  doc.text(fi(n.net),c3-2,y,{align:'right'});
   y+=14;
 
   // Page 2 monthly
@@ -543,21 +543,23 @@ function dlPDF(){
   var mc=['Month','Basic','DA','DA Arr','HRA','Risk','Other','Gross','CPS/GPF','SPF','Ded.','Net Pay'];
   var mw=[20,15,13,12,12,13,13,16,16,11,14,15];
   var xp=M;
-  doc.setFillColor(17,17,17);doc.rect(M,y-5,W-2*M,8,'F');doc.setFontSize(6.5);doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');
+  doc.setFillColor(220,220,220);doc.rect(M,y-5,W-2*M,8,'F');doc.setDrawColor(150,150,150);doc.setLineWidth(0.3);doc.rect(M,y-5,W-2*M,8,'S');
+  doc.setFontSize(6.5);doc.setTextColor(17,17,17);doc.setFont('helvetica','bold');
   mc.forEach(function(c,i){doc.text(c,xp+mw[i]/2,y,{align:'center'});xp+=mw[i];});y+=5;
 
   rows.forEach(function(r,idx){
     if(y>270)addPg();
     var vs=[r.m,r.b.toLocaleString('en-IN'),r.da.toLocaleString('en-IN'),r.arr?r.arr.toLocaleString('en-IN'):'-',r.hra.toLocaleString('en-IN'),r.risk.toLocaleString('en-IN'),(r.other-r.risk).toLocaleString('en-IN'),r.gross.toLocaleString('en-IN'),r.cpsgpf.toLocaleString('en-IN'),r.spf.toLocaleString('en-IN'),r.td.toLocaleString('en-IN'),r.net.toLocaleString('en-IN')];
-    if(idx%2===0){doc.setFillColor(248,246,240);doc.rect(M,y-4,W-2*M,7,'F');}
+    if(idx%2===0){doc.setFillColor(245,245,245);doc.rect(M,y-4,W-2*M,7,'F');}
     doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(17,17,17);
     xp=M;vs.forEach(function(v,i){doc.text(v,i===0?xp+2:xp+mw[i],y,{align:i===0?'left':'right'});xp+=mw[i];});
-    doc.setDrawColor(228,225,220);doc.setLineWidth(0.15);doc.line(M,y+3,W-M,y+3);y+=7;
+    doc.setDrawColor(190,190,190);doc.setLineWidth(0.15);doc.line(M,y+3,W-M,y+3);y+=7;
   });
   var tt=rows.reduce(function(a,r){['b','da','arr','hra','risk','other','gross','cpsgpf','spf','td','net'].forEach(function(k){a[k]=(a[k]||0)+r[k];});return a;},{});
-  doc.setFillColor(17,17,17);doc.rect(M,y-4,W-2*M,9,'F');
+  doc.setFillColor(220,220,220);doc.rect(M,y-4,W-2*M,9,'F');
+  doc.setDrawColor(150,150,150);doc.setLineWidth(0.3);doc.rect(M,y-4,W-2*M,9,'S');
   var tv=['TOTAL',tt.b,tt.da,tt.arr||0,tt.hra,tt.risk,tt.other-tt.risk,tt.gross,tt.cpsgpf,tt.spf,tt.td,tt.net].map(function(v,i){return i===0?v:v.toLocaleString('en-IN');});
-  doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(17,17,17);
   xp=M;tv.forEach(function(v,i){doc.text(v,i===0?xp+2:xp+mw[i],y,{align:i===0?'left':'right'});xp+=mw[i];});
 
   var pc=doc.internal.getNumberOfPages();
